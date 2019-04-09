@@ -15,3 +15,8 @@ export interface IntervalValues {
   interval: string; // 10s,5m
   intervalMs: number;
 }
+
+export interface Timezone {
+  raw: string;
+  isUtc: boolean;
+}

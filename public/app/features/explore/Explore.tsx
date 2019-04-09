@@ -32,7 +32,7 @@ import {
 } from './state/actions';
 
 // Types
-import { RawTimeRange, TimeRange, DataQuery, ExploreStartPageProps, ExploreDataSourceApi } from '@grafana/ui';
+import { RawTimeRange, TimeRange, DataQuery, ExploreStartPageProps, ExploreDataSourceApi, Timezone } from '@grafana/ui';
 import { ExploreItemState, ExploreUrlState, RangeScanner, ExploreId, ExploreUpdateState } from 'app/types/explore';
 import { StoreState } from 'app/types';
 import { LAST_USED_DATASOURCE_KEY, ensureQueries, DEFAULT_RANGE, DEFAULT_UI_STATE } from 'app/core/utils/explore';
@@ -41,6 +41,7 @@ import { ExploreToolbar } from './ExploreToolbar';
 import { scanStopAction } from './state/actionTypes';
 import { NoDataSourceCallToAction } from './NoDataSourceCallToAction';
 import { FadeIn } from 'app/core/components/Animations/FadeIn';
+import { getTimezone } from '../profile/state/selectors';
 
 interface ExploreProps {
   StartPage?: ComponentClass<ExploreStartPageProps>;
@@ -71,6 +72,7 @@ interface ExploreProps {
   supportsTable: boolean | null;
   queryKeys: string[];
   urlState: ExploreUrlState;
+  timezone: Timezone;
 }
 
 /**
@@ -112,11 +114,11 @@ export class Explore extends React.PureComponent<ExploreProps> {
   }
 
   componentDidMount() {
-    const { exploreId, urlState, initialized } = this.props;
+    const { exploreId, urlState, initialized, timezone } = this.props;
     const { datasource, queries, range = DEFAULT_RANGE, ui = DEFAULT_UI_STATE } = (urlState || {}) as ExploreUrlState;
     const initialDatasource = datasource || store.get(LAST_USED_DATASOURCE_KEY);
     const initialQueries: DataQuery[] = ensureQueries(queries);
-    const initialRange = { from: parseTime(range.from), to: parseTime(range.to) };
+    const initialRange = { from: parseTime(range.from, timezone.isUtc), to: parseTime(range.to, timezone.isUtc) };
     const width = this.el ? this.el.offsetWidth : 0;
 
     // initialize the whole explore first time we mount and if browser history contains a change in datasource
@@ -320,6 +322,7 @@ function mapStateToProps(state: StoreState, { exploreId }: ExploreProps) {
     queryKeys,
     urlState,
     update,
+    timezone: getTimezone(state.user),
   };
 }
 

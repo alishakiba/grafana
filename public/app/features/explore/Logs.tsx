@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React, { PureComponent } from 'react';
 
 import * as rangeUtil from 'app/core/utils/rangeutil';
-import { RawTimeRange, Switch, LogLevel } from '@grafana/ui';
+import { RawTimeRange, Switch, LogLevel, Timezone } from '@grafana/ui';
 import TimeSeries from 'app/core/time_series2';
 
 import { LogsDedupDescription, LogsDedupStrategy, LogsModel, LogsMetaKind } from 'app/core/logs_model';
@@ -49,6 +49,7 @@ interface Props {
   highlighterExpressions: string[];
   loading: boolean;
   range?: RawTimeRange;
+  timezone: Timezone;
   scanning?: boolean;
   scanRange?: RawTimeRange;
   dedupStrategy: LogsDedupStrategy;
@@ -156,6 +157,7 @@ export default class Logs extends PureComponent<Props, State> {
       loading = false,
       onClickLabel,
       range,
+      timezone,
       scanning,
       scanRange,
       width,
@@ -200,6 +202,7 @@ export default class Logs extends PureComponent<Props, State> {
             height={100}
             width={width}
             range={range}
+            timezone={timezone}
             id={`explore-logs-graph-${exploreId}`}
             onChangeTime={this.props.onChangeTime}
             onToggleSeries={this.onToggleLogLevel}
